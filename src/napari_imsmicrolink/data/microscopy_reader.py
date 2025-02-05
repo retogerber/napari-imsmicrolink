@@ -5,19 +5,23 @@ from typing import Union, List, Dict  # noqa: E402
 from pathlib import Path  # noqa: E402
 import numpy as np  # noqa: E402
 import dask.array as da  # noqa: E402
-from aicsimageio.readers.bioformats_reader import BioFile  # noqa: E402
 from ome_types import OME  # noqa: E402
+import tifffile
 from napari_imsmicrolink.utils.image import guess_rgb  # noqa: E402
 
 PathLike = Union[str, Path]
+
+# image_filepath = Path("/home/retger/Nextcloud/Projects/test_imc_to_ims_workflow/imc_to_ims_workflow/results/test_combined/data/postIMC/test_combined_postIMC.ome.tiff")
+# img = tifffile.tifffile.TiffFile(image_filepath)
 
 
 class MicroRegImage:
     def __init__(self, image_filepath: PathLike):
         self.image_filepath: PathLike = image_filepath
-        with BioFile(self.image_filepath) as bf:
-            self.n_scenes: int = len(bf.ome_metadata.images)
-            self.ome_metadata: OME = bf.ome_metadata
+        with tifffile.tifffile.TiffFile(image_filepath) as bf:
+            n_scenes: int = len(bf.series)
+            ome_metadata: OME = bf.ome_metadata
+        
         self.base_layer_pixel_res: float = 1
         self.base_layer_idx: int = 0
         self.cnames: List[str, ...] = []
